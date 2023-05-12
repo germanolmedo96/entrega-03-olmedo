@@ -25,7 +25,13 @@ const publicAccess = (req, res, next) => {
 const privateAccess = (req, res, next) => {
         if (!req.session.user) return res.redirect('/login'); 
         next();
+}
+
+const privateAcces = (req, res, next)=>{
+    if (req.session.user.role = 'admin') {
+        return res.status(401).send({ error: 'UNAUTHORIZED' });
     }
+}
     
     router.get('/products',privateAccess , getProductsView)
     // const isLogin = req.session.user ? true : false;
@@ -125,7 +131,7 @@ router.get('/', privateAccess, getView);
 router.get('/realtimeproducts', privateAccess, realTimeProductsView);
     // res.render('realTimeProducts', {style: 'realTimeProducts.css'});
 
-router.get('/chat', privateAccess, chatView);
+router.get('/chat', privateAcces, chatView);
     // res.render('chat', {style: 'chat.css'})
 
 var cartId;

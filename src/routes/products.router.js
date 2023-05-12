@@ -22,12 +22,12 @@ const adminAccess = (req, res, next) => {
     next();
 };
 
-router.get('/' ,privateAccess ,getProducts)
+router.get('/',getProducts)
     // let products = await productsManager.getAll();
     // console.log(products);
     // res.send({status:"success" , payload:products})
     
-    router.post('/',privateAccess, adminAccess ,postProducts )
+    router.post('/' ,postProducts ,privateAccess, adminAccess  )
     // const {title,description,price,code,quantity,category,thumbnail} = req.body;
 
     // let newProduct = {

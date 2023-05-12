@@ -60,7 +60,7 @@ export const getProductsView = async(req,res)=>{
 export const getCarView = async(req,res)=>{
     try {
         const cart = await cartsManager.getById(cartId);
-        res.render('cart', { cart, style: 'cart.css' });
+        res.render('cart', { cart });
     } catch (err) {
         console.log(err);
     }
@@ -122,18 +122,18 @@ export const getCardId = async(req,res)=>{
     const cid = req.params.cid;
     try {
         const cart = await cartsManager.getById(cid);
-        res.render('cart', { cart, style: 'cart.css' });
+        res.render('cart', { cart });
     } catch (err) {
         console.log(err);
     }
 }
 
 export const getRegister = async(req,res)=>{
-    res.render('register', { style: 'register.css' });
+    res.render('register');
 }
 
 export const getLoginView = async(req,res)=>{
-    res.render('login', { style: 'login.css' });
+    res.render('login');
 }
 
 export const profileView = async(req,res)=>{
@@ -146,7 +146,7 @@ export const getView = async(req,res)=>{
         // const products = await manager.getAll();
 
         const products = await productsManager.getAll(); 
-        res.render('home', {products, style: 'home.css'});
+        res.render('home', {products});
 }
 
 export const realTimeProductsView = async(req,res)=>{
@@ -154,7 +154,7 @@ export const realTimeProductsView = async(req,res)=>{
 }
 
 export const chatView = async(req,res)=>{
-    res.render('chat', {style: 'chat.css'})
+    res.render('chat')
 }
 
 var cartId;

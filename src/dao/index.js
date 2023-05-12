@@ -1,6 +1,6 @@
 
 import Carts from "./dbManager/carts.js";
-import Products from "./dbManager/carts.js";
+import Products from "./dbManager/products.js";
 import Users from "./dbManager/users.js";
 import Tickets from "./dbManager/tickets.js";
 

@@ -26,7 +26,7 @@ export default class Products {
 			}
 		}
 
-		const result = await productModel.paginate(queryObject, options);
+		const result = await productsModel.paginate(queryObject, options);
 
 		if(options.page > result.totalPages || options.page <= 0 || isNaN(options.page)) throw new err('Incorrect page request', 400);
 		

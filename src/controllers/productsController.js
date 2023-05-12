@@ -14,28 +14,47 @@ export const getProducts = async(req,res)=>{
 
 export const postProducts = async(req,res)=>{
 
+    // try{
+    //     const { title,description,code,price,status,stock,category,thumbnails,id } = req.body;    
+
+    //     if(!title || !description || !code || !price || !stock || !category){
+    //         return res.status(400).send({status: 'error', message:'Valores incompletos'});
+    //     } 
+
+    //     const product = {
+    //         title,
+    //         description,
+    //         code,
+    //         price,
+    //         stock, 
+    //         category,
+    //         thumbnails,
+    //     };
+        
+    //     const result = await productsService.saveProduct(product);
+
+    //     res.send({ result: 'success', result});
+    // }catch(error){
+    //     res.status(500).send({error});
+    // }
+
     const product = req.body;
 	try {
 		const result = await addOneService(product);
 		res.send({ status: 'success', payload: result });
     } catch (error) {
-        res.status(error.httpStatusCode || 500).send({ error: error.message });
+        res.status(error.httpStatusCode || 500).send({ error });
     }
 
-    // const {title,description,price,code,quantity,category,thumbnail} = req.body;
 
-    // let newProduct = {
-    //     title,
-    //     description,
-    //     price,
-    //     code,
-    //     quantity,
-    //     category,
-    //     thumbnail
-    // };
+    // const { title,description,code,price,status,stock,category,thumbnails,id } = req.body;
+	// try {
+	// 	const result = await addOneService(product);
+	// 	res.send({ status: 'success', payload: result });
+    // } catch (error) {
+    //     res.status(error.httpStatusCode || 500).send({ error: error.message });
+    // }
 
-    // const result = await productsManager.saveProduct(newProduct);
-    // res.send({status:"success" , payload:result});
 }
 
 export const putProduct = async(req,res)=>{
