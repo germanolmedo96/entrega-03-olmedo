@@ -4,6 +4,12 @@ import Products from "../dao/dbManager/products.js";
 import cartsModel from "../dao/models/carts.js";
 import productsModel from "../dao/models/products.js";
 
+import * as viewsService from '../services/view.service.js'
+import jwt from 'jsonwebtoken';
+import config from '../config/config.js';
+
+const PRIVATE_KEY = config.secret;
+
 import { getByIdService as cart_getByIdService} from "../services/carts.service.js";
 import { getAllService as product_getAllService } from "../services/products.service.js";
 
@@ -14,24 +20,13 @@ const messagesManager = new Messages();
 
 
 export const getProductsView = async(req,res)=>{
-	const { page = 1, limit = 10, sort, query} = req.query;
-	const user = req.session.user
-	const options = {
-		page,
-		limit,
-		...(sort && { sort: { price: sort } })
-	}
-
-	try {
-		const result = await product_getAllService(query, options);
-		const payload = {
-			user,
-			...result
-		}
-		res.render('products', payload);
+        try {
+            const products = await viewsService.getAllProducts(); 
+            res.render('home', {products, style: 'home.css'});
         } catch (error) {
-            res.status(error.httpStatusCode || 500).send({ error: error.message });
+            res.status(500).send({error});
         }
+    
 
     // const isLogin = req.session.user ? true : false;
     // const user = req.session.user;
@@ -59,10 +54,14 @@ export const getProductsView = async(req,res)=>{
 
 export const getCarView = async(req,res)=>{
     try {
-        const cart = await cartsManager.getById(cartId);
-        res.render('cart', { cart });
-    } catch (err) {
-        console.log(err);
+        console.log(`view cart: ${req.session.user.cart}`)
+        let cid = req.session.user.cart;
+
+        const cart = await viewsService.getCart(cid);
+
+        res.render('cart', {cart, style: 'cart.css'})
+    } catch (error) {
+        res.status(500).send({error});
     }
 }
 
@@ -166,7 +165,7 @@ export const viewP = async(req,res)=>{
     if(stock) query = {stock : `${stock}`};
     if(category && stock) query = {$and: [ {category : `${category}`},{stock : `${stock}`} ]}  
 
-    const result = await productsManager.getAllPage(limit, page, sort, query)
+    const result = await viewsService.getProductsPaginate(limit, page, sort, stock, category)
 
     const products = result.docs; 
     const hasPrevPage = result.hasPrevPage;

@@ -15,6 +15,7 @@ export default class Users {
         return await userModel.findById(id);
     };
 
+
     create = async (user) => {
         if(user.email.startsWith('admin')) user['role'] = 'admin';
         const result = await userModel.create(user);

@@ -44,7 +44,7 @@ export const postLogin = async(req,res)=>
         return res.send({ status: "success", message: "logueado" });
     }
 
-    if (!req.user) return res.status(400).send({ status: "error", error: "Contraseña invalida" });
+    // if (!req.user) return res.status(400).send({ status: "error", error: "Contraseña invalida" });
 
     req.session.user = {
         first_name: req.user.first_name,

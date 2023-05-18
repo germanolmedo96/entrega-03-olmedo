@@ -34,4 +34,18 @@ export class errorWithStatusCode extends Error {
 	}
 }
 
+export const generateProduct = () => {
+    return {
+        title: faker.commerce.productName(),
+        description: faker.commerce.productDescription(),
+        code: faker.string.alphanumeric(10),
+        price: faker.commerce.price(),
+        status: faker.helpers.arrayElement(["true", "false"]),
+        stock: faker.string.numeric(1),
+        category: faker.commerce.department(),
+        thumbnails: faker.image.url(),
+        id: faker.database.mongodbObjectId(),    
+    }
+}
+
 export default __dirname;

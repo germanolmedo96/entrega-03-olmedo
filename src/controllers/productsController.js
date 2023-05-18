@@ -1,5 +1,7 @@
 import Products from "../dao/dbManager/products.js";
 import productsModel from "../dao/models/products.js";
+import CustomError from '../services/errors/CustomError.js';
+import EErrors from '../services/errors/enum.js';
 import { getAllService, getByIdService, addOneService, updateOneByIdService, deleteOneByIdService } from "../services/products.service.js";
 
 const productsManager = new Products();
@@ -14,46 +16,44 @@ export const getProducts = async(req,res)=>{
 
 export const postProducts = async(req,res)=>{
 
-    // try{
-    //     const { title,description,code,price,status,stock,category,thumbnails,id } = req.body;    
+    try{
+        const { title,description,code,price,status,stock,category,thumbnails,id } = req.body;    
 
-    //     if(!title || !description || !code || !price || !stock || !category){
-    //         return res.status(400).send({status: 'error', message:'Valores incompletos'});
-    //     } 
+        if(!title || !description || !code || !price || !stock || !category){
+            // return res.status(400).send({status: 'error', message:'Valores incompletos'});
+            throw CustomError.createError({
+                name: 'UserError',
+                cause: generateProductErrorInfo({
+                    title,
+                    description,
+                    code,
+                    price,
+                    stock, 
+                    category
+                }),
+                message: 'Error tratando de crear un producto',
+                code: EErrors.INVALID_TYPES_ERROR
+            });
+        } 
 
-    //     const product = {
-    //         title,
-    //         description,
-    //         code,
-    //         price,
-    //         stock, 
-    //         category,
-    //         thumbnails,
-    //     };
+        const product = {
+            title,
+            description,
+            code,
+            price,
+            status,
+            stock, 
+            category,
+            thumbnails,
+            id
+        };
         
-    //     const result = await productsService.saveProduct(product);
+        const result = await addOneService(product);
 
-    //     res.send({ result: 'success', result});
-    // }catch(error){
-    //     res.status(500).send({error});
-    // }
-
-    const product = req.body;
-	try {
-		const result = await addOneService(product);
-		res.send({ status: 'success', payload: result });
-    } catch (error) {
-        res.status(error.httpStatusCode || 500).send({ error });
+        res.send({ result: 'success', result});
+    }catch(error){
+        res.status(500).send({error});
     }
-
-
-    // const { title,description,code,price,status,stock,category,thumbnails,id } = req.body;
-	// try {
-	// 	const result = await addOneService(product);
-	// 	res.send({ status: 'success', payload: result });
-    // } catch (error) {
-    //     res.status(error.httpStatusCode || 500).send({ error: error.message });
-    // }
 
 }
 

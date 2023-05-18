@@ -1,37 +1,48 @@
-import { Router } from "express";
-import {
-    getProductsView, getCarView, getCartId, getMessageView, 
-    postCardToProduct, getCardId, getRegister, getLoginView,
-    profileView, getView, realTimeProductsView, chatView,viewP
-} from '../controllers/viewController.js'
-// import Carts from "../dao/dbManager/carts.js";
-// import Messages from "../dao/dbManager/messages.js";
-// import Products from "../dao/dbManager/products.js";
-// import cartsModel from "../dao/models/carts.js";
-// import productsModel from "../dao/models/products.js";
+    import { Router } from "express";
+    import {
+        getProductsView, getCarView, getCartId, getMessageView, 
+        postCardToProduct, getCardId, getRegister, getLoginView,
+        profileView, getView, realTimeProductsView, chatView,viewP
+    } from '../controllers/viewController.js'
+    import jwt from 'jsonwebtoken';
+    import { mockingProducts } from '../../src/controllers/mockingProducts.controllers.js';
+    import config from '../config/config.js';
+    const PRIVATE_KEY = config.SECRET;
 
+    const router = Router();
+    // const productsManager = new Products();
+    // const cartsManager = new Carts();
+    // const messagesManager = new Messages();
 
-
-const router = Router();
-// const productsManager = new Products();
-// const cartsManager = new Carts();
-// const messagesManager = new Messages();
-
-const publicAccess = (req, res, next) => {
-    if (req.session.user) return res.redirect('/products'); 
-    next();
-}
-
-const privateAccess = (req, res, next) => {
-        if (!req.session.user) return res.redirect('/login'); 
+    export const publicAccess = (req, res, next) => {
+        if (req.session.user) return res.redirect('/products'); 
         next();
-}
-
-const privateAcces = (req, res, next)=>{
-    if (req.session.user.role = 'admin') {
-        return res.status(401).send({ error: 'UNAUTHORIZED' });
     }
-}
+
+    export const privateAccess = (req, res, next) => {
+        const token = req.cookies.token;
+        if (token) {
+        jwt.verify(token, PRIVATE_KEY, (err, decoded) => {
+            req.session.user = decoded;
+            next();
+        });
+        } else {
+        res.redirect('/login');
+        }
+    };
+    export const privateUserAccess = (req, res, next) => {
+        if (req.session.user) {
+            if(req.session.user.rol === "USER") {return next()};
+        } 
+        return res.redirect('/login')
+    }
+
+    export const privateAdminAccess = (req, res, next) => {    
+    if (req.session.user) {
+        if(req.session.user.rol === "ADMIN") {return next()};
+    } 
+    return res.redirect('/login')
+    }
     
     router.get('/products',privateAccess , getProductsView)
     // const isLogin = req.session.user ? true : false;
@@ -128,13 +139,13 @@ router.get('/', privateAccess, getView);
     // const products = await productsManager.getAll(); 
     // res.render('home', {products, style: 'home.css'});
 
-router.get('/realtimeproducts', privateAccess, realTimeProductsView);
+router.get('/realtimeproducts', privateAdminAccess, realTimeProductsView);
     // res.render('realTimeProducts', {style: 'realTimeProducts.css'});
 
-router.get('/chat', privateAcces, chatView);
+router.get('/chat', privateUserAccess, chatView);
     // res.render('chat', {style: 'chat.css'})
 
-var cartId;
+
 router.get('/products', privateAccess, viewP)
     // const { limit = 10, page = 1, sort, category, stock} = req.query;
 
@@ -153,5 +164,9 @@ router.get('/products', privateAccess, viewP)
     // const Page = result.page;
     // res.render('products', {products, hasPrevPage, prevPage, hasNextPage,  nextPage, Page, cartId, user: req.session.user, style: 'home.css'})
 
+    router.use('/mockinkg-products', mockingProducts)
 
 export default router;
+
+
+

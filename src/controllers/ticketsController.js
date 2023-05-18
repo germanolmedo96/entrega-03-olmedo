@@ -1,5 +1,5 @@
-import Ticket from "../dao/dbManagers/tickets.js";
-import User from "../dao/dbManagers/users.js";
+import Ticket from "../dao/dbManager/tickets.js";
+import User from "../dao/dbManager/users.js";
 
 const ticketService = new Ticket();
 const userService = new User();
@@ -12,24 +12,47 @@ export const getTickets = async (req,res) => {
 }
 
 export const createTicket = async (req,res) => {
-    const {user,cart} = req.body; 
-    //Generamos codigo unico
-    let code = await ticketService.createCode();
-    //Fecha actual de generacion de ticket
-    let purchase_datetime = new Date();
-    //Usuario que genero el ticket
-    let resultUser = await userService.getById(user);
-    //Monto total a pagar del carrito
-    
+        try {
+        const {username,products} = req.body;
+        const resultUser = await userService.getUserByUsername(username);
+        const resultProducts = await fetch('http://localhost:8080/api/products/?limit=999')
+        .then( (response) => response.json());
+        let actualTickets = products.filter(product=> {
+            let flag = false;
+            resultProducts.payload.forEach(element => {
+                if(element._id == product.product._id){
+                    flag = true
+                }
+            });
+            return flag;
+        })
+        let sum = actualTickets.reduce((acc,prev)=>{
+            acc += prev.product.price * prev.quantity 
+            return acc;
+        },0)
+        let ticketNumber = Date.now() + Math.floor(Math.random()*10000+1)
+        
+        let ticket = {
+            code: ticketNumber,
+            purchaser: username,
+            purchase_datetime: new Date(),
+            products: actualTickets.map(product=>product.product._id),
+            amount: sum,
+        }
 
-
-
-    res.send({status:"success",result:result})
+        const ticketResult = await ticketService.createTicket(ticket);
+        resultUser.orders.push(ticketResult._id)
+        await userService.updateUser({username}, resultUser)
+        res.send({status: 200, payload: ticketResult});
+    }   
+    catch(error) {
+        next(error)
+    }
 }
 
 
 
-export const getTicketbyid = async (req,res) => {
+export const getTicketById = async (req,res) => {
     res.send({status:"success",result:result})
 }
 
@@ -41,6 +64,7 @@ export const resolveTicket = async (req,res) => {
 export default{
     getTickets,
     createTicket,
-    getTicketbyid,
+    getTicketById,
     resolveTicket
 }
+
