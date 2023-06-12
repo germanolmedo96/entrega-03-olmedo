@@ -50,7 +50,7 @@ router.get('/logout', privateAccess,getLogout);
     //     res.redirect('/products');
     // })
 
-router.get('/github', publicAccess,passport.authenticate('github', { scope: ['user:email'] }) ,getGitHub);
+router.get('/github', publicAccess,passport.authenticate('github', {session: false, scope: ['user:email'] }) ,getGitHub);
 // passport.authenticate('github', { scope: ['user:email'] }), async (req, res) => {
 //     res.send({ status: 'succes', message:'user Registered'});
 router.get('/github-callback', publicAccess,passport.authenticate('github', { failureRedirect: '/login' }) ,getGitHubCallback )

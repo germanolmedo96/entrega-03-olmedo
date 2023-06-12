@@ -7,7 +7,7 @@ export default class Carts {
     }
 
     create = async () => {
-		return await cartModel.create({ products: [] });
+		return await cartsModel.create({ products: [] });
 	}
 
     getAll = async () => {

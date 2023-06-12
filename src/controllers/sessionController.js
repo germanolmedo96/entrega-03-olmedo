@@ -1,9 +1,31 @@
 import passport from 'passport';
 import config from '../config/config.js'
 import userModel from "../dao/models/user.js";
+import * as UserService from "../services/user.service.js"
+import {Aregister } from '../services/session.services.js';
 
 export const  postRegister = async(req,res)=>{
-    res.send({ status: 'success', message: 'User registered' })
+    try{
+        const { first_name, last_name, email, age, password, rol } = req.body;
+
+        if(!first_name || !last_name || !email || !age || !password || !rol ){
+            return res.sendClientError('incomplete values');
+        }
+
+        const user = { first_name, last_name, email, age, password, rol };
+        
+        const result = await Aregister(user);
+
+        if(result==='exist'){
+            return res.sendClientError('User already exists');
+        }
+        res.sendSuccess(result); 
+        req.logger.info(`Solicitud procesada: ${req.method} ${req.url}`);
+        
+    } catch(error){
+        req.logger.error(`${req.method} en ${req.url} - ${new Date().toISOString()}`);
+        res.sendServerError(error);
+    }
 }
 
 export const failLogin = async(req,res)=>{
@@ -75,14 +97,19 @@ export const getGitHub = async(req,res)=>{
 }
 
 export const getGitHubCallback= async(req,res)=>{
-        req.session.user = {
-            name: `${req.user.first_name} ${req.user.last_name}`,
-            age: req.user.age,
-            email: req.user.email,
-            // rol: rol
-        }
+    try {
+        const accessToken = await UserService.githubCallback(req.user);
     
-        res.redirect('/products'); 
+        res
+          .cookie("coderCookieToken", accessToken, {
+            maxAge: 60 * 60 * 24 * 7,
+            httpOnly: true,
+          })
+          .redirect("/products");
+      } catch (error) {
+        logger.error(error);
+        res.status(500).send(error);
+      }
 }
 export default{
     postRegister,

@@ -2,6 +2,7 @@ import {fileURLToPath} from 'url';
 import { dirname } from 'path';
 import bcrypt from 'bcrypt';	
 import passport from "passport";
+import jwt from 'jsonwebtoken';
 
 const __filename = fileURLToPath(import.meta.url); 
 const __dirname = dirname(__filename);
@@ -26,6 +27,17 @@ export const passportCall = (strategy) => {
 	};
   };
   
+  export const generateToken = (usuario) => {
+    return jwt.sign(usuario, PRIVATE_KEY); 
+}
+
+export const compareHashedData = async (password, passwordDB) => {
+    return bcrypt.compare(password, passwordDB);
+}
+
+export const hashData = async (password) => {
+    return bcrypt.hash(password,10); 
+}
 
 export class errorWithStatusCode extends Error {
 	constructor(message, httpStatusCode) {

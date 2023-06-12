@@ -6,10 +6,12 @@ import Tickets from "./dbManager/tickets.js";
 
 const mongoCartsDao = new Carts();
 const mongoProductsDao = new Products();
-const mongoUsersDao = new Users();
+export const mongoUsersDao = new Users();
+const updateSessionDao = new Users()
 const mongoTickesDao = new Tickets();
 
 export const CARTDAO = mongoCartsDao;
 export const PRODUCTDAO = mongoProductsDao;
 export const USERDAO = mongoUsersDao;
 export const TICKETDAO = mongoTickesDao;
+export const USERSUPDATE = updateSessionDao

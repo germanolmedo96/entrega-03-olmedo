@@ -1,4 +1,8 @@
 import userModel from '../dao/models/user.js';
+import {login} from "../repository/sessions.repository.js";
+import {createCartRepository} from "../repository/carts.repository.js";
+import {updateSess} from '../services/session.services.js'
+
 
 class UserService {
     
@@ -22,6 +26,16 @@ class UserService {
         let result = await userModel.updateOne(filter, value);
         return result;
     }
+    githubCallback = async (user) => {
+        user = await login(user);
+        if (!user.cart) {
+          const cart = await createCartRepository();
+          user.cart = cart._id.toString();
+          await updateSess(user.email, user);
+        }
+      
+        return generateToken(user);
+      };
     delete = async (username) => {
         if(username) {
             let result = await userModel.deleteOne({username: username});
